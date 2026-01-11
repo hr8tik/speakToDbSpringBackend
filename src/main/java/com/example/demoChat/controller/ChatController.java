@@ -10,19 +10,9 @@ import org.apache.catalina.User;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.ResponseEntity;
 import java.util.List;
-@CrossOrigin(
-        origins = "http://localhost:8081",   // React / frontend
-        allowedHeaders = "*",
-        methods = {
-                org.springframework.web.bind.annotation.RequestMethod.GET,
-                org.springframework.web.bind.annotation.RequestMethod.POST,
-                org.springframework.web.bind.annotation.RequestMethod.PUT,
-                org.springframework.web.bind.annotation.RequestMethod.DELETE,
-                org.springframework.web.bind.annotation.RequestMethod.OPTIONS
-        }
-)
+
 @RestController
 public class ChatController {
 
@@ -67,11 +57,44 @@ public class ChatController {
         return service.postData(user);
    }
 
+   @PostMapping("/updateUser")
+   public ResponseEntity<UserEntity> updateUser(
+           @RequestBody UserEntity user) {
+
+       UserEntity updatedUser = service.updateUser(user);
+       return ResponseEntity.ok(updatedUser);
+   }
+
+
+    @DeleteMapping("/deleteuser/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+
+        if (id == null) {
+            return ResponseEntity.badRequest()
+                    .body("User ID must be provided");
+        }
+
+        service.deleteUser(id);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PostMapping("/addorders")
+    public ResponseEntity<Order> addOrder(@RequestBody Order order){
+        Order newOrder = service.addOrder(order);
+        return ResponseEntity.ok(newOrder);
+    }
+
+    @PostMapping("/editOrders")
+    public ResponseEntity<Order> editOrders(@RequestBody Order order){
+        Order newOrder = service.editOrder(order);
+        return ResponseEntity.ok(newOrder);
+    }
+
+
     @PostMapping("/ask-db")
     public Object askDatabase(@RequestBody String question) {
 
         String jpql = aiQueryService.generateJPQL(question);
-
 
         return dbService.execute(jpql);
     }
