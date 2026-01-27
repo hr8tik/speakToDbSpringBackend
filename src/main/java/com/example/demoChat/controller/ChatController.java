@@ -97,6 +97,8 @@ public class ChatController {
         String jpql = aiQueryService.generateJPQL(question);
 
         return dbService.execute(jpql);
+
+        
     }
 
 
